@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="btn" onclick="showGame()">
+        <input type="button"  value="Start Game">
+    </div>
+    <div id="wrapper" style="display:none">
+        <h1>English Game</h1>
+        <h4 id="timeGame"></h4>
+        <h4 id="score"></h4>
+        <h4 id="attempt"></h4>
+        <div class="lang" id="english">
+            <div class="word-box">
+                <h3 class="word" draggable="true" aria-disabled="true"></h3>
+            </div>
+            <div class="word-box" >
+                <h3 class="word" draggable="true"></h3>
+            </div>
+            <div class="word-box">
+                <h3 class="word" draggable="true"></h3>
+            </div>
+            <div class="word-box">
+                <h3 class="word" draggable="true"></h3>
+            </div>
+            <div class="word-box">
+                <h3 class="word" draggable="true"></h3>
+            </div>
+            <div class="word-box">
+                <h3 class="word" draggable="true"></h3>
+            </div>
+        </div>
+
+        <div  class="lang" id="fr">
+                <div class="word-box">
+                    <h3 class="word" ></h3>
+                </div>
+                <div class="word-box">
+                    <h3 class="word" ></h3>
+                </div>
+                <div class="word-box">
+                    <h3 class="word" ></h3>
+                </div>
+                <div class="word-box">
+                    <h3 class="word" ></h3>
+                </div>
+                <div class="word-box">
+                    <h3 class="word" ></h3>
+                </div>
+                <div class="word-box">
+                    <h3 class="word" ></h3>
+                </div>
+        </div>
+
+    
+
+
+    </div>
+        <!--win box-->
+        <div id="boxWin">
+
+            <h2>Good Job</h2>
+            
+            <p>Time :</p>
+            <p>score :</p>
+            <input type="button" value="Ok" onclick="hide(this)">
+        </div>
+    <script>
+    
+    const wordeEng =["hello","write","read","tree","sun","son"];
+    var wordesFr =["salut","ecrire","lire","arbre","soleil","fils"];
+    var _wordEng= document.querySelectorAll("#english .word");
+    var _wordFr = document.querySelectorAll("#fr .word");
+    var score=0;
+    var engWord="";
+    var frWord="";
+    var arrayeng=  shuffle( wordeEng.slice(0));
+    var arrayfr= shuffle(wordesFr.slice(0));
+    var gragElement;
+    var attempt=6;
+    document.getElementById("boxWin").style.display="none";
+    
+    for (var i = 0; i < _wordEng.length; i++) {
+        _wordEng[i].innerHTML =arrayeng[i];
+        _wordFr[i].innerText= arrayfr[i];
+        console.log(wordeEng[i]);
+        
+        
+    }
+    for ( i = 0; i < _wordEng.length; i++) {
+        _wordEng[i].addEventListener('dragstart',dragStart);
+        _wordEng[i].addEventListener('dragend',dragEnd);
+        //_wordEng[i].addEventListener('drop',dragDrop);
+        
+    }
+    // add eventListener 
+    for ( i = 0; i < _wordFr.length; i++) {
+        _wordFr[i].addEventListener('dragenter',dragEnter);
+        _wordFr[i].addEventListener('dragleave',dragLeave);
+        _wordFr[i].addEventListener('dragover',dragOver);
+        _wordFr[i].addEventListener('drop',dragDrop);
+        
+        
+    }
+    function dragStart(e){
+        engWord=e.target.innerText;
+        gragElement = e.target;
+        setTimeout(()=>e.target.classList.add("invisible"),0);
+        
+    }
+    function dragEnter(e){
+        e.preventDefault();
+        e.target.parentElement.classList.add("enter");
+        e.target.parentElement.classList.add("hovered");
+        
+
+    }
+    function dragLeave(e){
+        e.preventDefault();
+
+        e.target.parentElement.classList.remove("enter");
+        e.target.parentElement.classList.remove("hovered");
+    }
+    function dragOver(e){
+        e.preventDefault();
+        e.target.parentElement.classList.add("hovered");
+    }
+    function dragDrop(e){
+            e.preventDefault();
+            e.target.parentElement.classList.remove("hovered");
+            e.target.parentElement.classList.remove("enter");
+            if(attempt>0)
+            document.getElementById("attempt").innerText="attempt :"+--attempt;
+            if(attempt!=0){
+               
+                if(wordesFr.indexOf(e.target.innerText)==wordeEng.indexOf(engWord))
+                    {
+
+                        if(localStorage["score"]!="")
+                        {
+                            score = parseInt(localStorage["score"]);
+                        }
+                        score+=10;
+                        document.getElementById("score").innerHTML="your score : "+score;
+                        e.target.parentElement.style.background="green";
+                        localStorage["score"]=score;
+                        gragElement.draggable=false;
+                        gragElement.parentElement.style.backgroundColor="green";
+                        //console.log(gragElement.parentElement)
+                        
+                    }
+                else {
+                    e.target.parentElement.style.background="red";
+                    
+                    
+
+                    }      
+                    
+            }else{
+                console.log("h");
+                        checkWiner()
+            }
+
+    }
+    function dragEnd(e){
+
+        e.target.classList.remove("invisible");
+    }
+
+    function  shuffle(array){
+     
+        var i=0,j=0,swap="";
+        var newArray=array;
+        var lent =newArray.length;
+        for ( i=lent-1; i >0 ; i--) {
+            j= Math.floor(Math.random()*newArray.length);
+
+            swap = newArray[i];
+            newArray[i]=newArray[j];
+            newArray[j]=swap;
+            
+        }
+        return newArray;
+    }
+
+    function showGame(){
+        document.querySelector("#btn").style.display="none";
+        document.querySelector("#wrapper").style.display="block";
+        if(localStorage["score"]!=undefined)
+            document.getElementById("score").innerHTML="your score : "+localStorage["score"];
+        else
+            {
+                localStorage["score"]="0";
+            document.getElementById("score").innerHTML="your score : "+score;
+
+            }
+        
+        document.getElementById("attempt").innerText="attempt :"+attempt;
+        setInterval(function(){
+        var timeGame = document.getElementById("time").innerHTML="Time :"+minutes(i++);
+        
+
+    },1000)
+    }
+    function minutes(sec){
+    
+     if(Math.floor(sec/60)<10)   
+        return  "0"+Math.floor(sec/60)+":"+(Math.floor(sec%60)<10?"0"+Math.floor(sec%60):Math.floor(sec%60));
+    else 
+        return  Math.floor(sec/60)+":"+(Math.floor(sec%60)<10?"0"+Math.floor(sec%60):Math.floor(sec%60));
+    
+
+    }
+
+    function checkWiner()
+        {
+            if(parseInt(localStorage["score"])>30){
+                document.getElementById("wrapper").style.display="none";
+                document.getElementById("boxWin").style.display="block";
+                clearInterval(timeGame);
+                document.getElementById("timeGame").innerText+=minutes(i);
+                localStorage["score"]=0;
+                
+            }
+                
+
+        }
+    function hide(e){
+        this.style.display="none";
+    }
+    
+
+    
+    </script>
+</body>
+</html>
